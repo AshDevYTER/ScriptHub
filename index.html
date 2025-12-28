@@ -1,225 +1,140 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Script Hub</title>
 <link rel="icon" href="logo.png">
 <style>
-*{box-sizing:border-box;font-family:Inter,system-ui,Arial}
-body{margin:0;background:#0b0b0b;color:#fff}
-header{display:flex;align-items:center;gap:12px;padding:14px 18px;background:#000;position:fixed;top:0;left:0;right:0}
-#logo{width:40px;height:40px;border-radius:50%;overflow:hidden}
-#logo img{width:100%;height:100%;object-fit:cover}
-header button{background:#4fc3f7;border:none;padding:10px 16px;border-radius:12px;font-weight:800;cursor:pointer}
-main{margin-top:70px;padding:20px;max-width:1100px;margin-inline:auto}
-.upload{display:none;background:#111;padding:16px;border-radius:14px;margin-bottom:20px}
-.upload input{width:100%;padding:10px;margin-bottom:10px;border-radius:10px;border:1px solid #333;background:#000;color:#fff}
-.scriptEditor{border:1px solid #333;border-radius:12px;padding:10px;margin-bottom:10px;position:relative}
-.scriptEditor textarea{width:100%;min-height:120px;background:#000;color:#fff;border:1px solid #333;border-radius:10px;padding:10px}
-.removeBtn{position:absolute;top:8px;right:8px;background:#ff5252;border:none;padding:4px 8px;border-radius:8px;font-weight:700;cursor:pointer}
-.addBtn,.uploadBtn{width:100%;padding:12px;border-radius:12px;border:none;font-weight:800;cursor:pointer;margin-top:10px}
-.addBtn{background:#1a1a1a;color:#fff}
-.uploadBtn{background:#4fc3f7;color:#000}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-.card{background:#111;border-radius:14px;padding:14px;cursor:pointer}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center}
-.view{background:#000;width:90%;max-width:800px;padding:16px;border-radius:16px}
-.scriptBlock{margin-bottom:16px}
-.scriptBlock h4{margin:0 0 6px 0}
-.scriptBlock pre{background:#111;padding:12px;border-radius:10px;white-space:pre-wrap}
-.copyBtn{margin-top:6px;background:#333;color:#fff;border:none;padding:6px 10px;border-radius:8px;cursor:pointer}
-.danger{background:#ff5252;color:#000}
+body{margin:0;background:#0b0b0b;color:#fff;font-family:Arial}
+header{display:flex;gap:10px;padding:12px;background:#000;position:fixed;width:100%}
+button{background:#4fc3f7;border:none;padding:10px 14px;border-radius:10px;font-weight:700}
+main{margin-top:70px;padding:20px}
+.upload{display:none;background:#111;padding:14px;border-radius:12px}
+.scriptEditor{border:1px solid #333;border-radius:10px;padding:10px;margin-bottom:10px;position:relative}
+.scriptEditor input,.scriptEditor textarea{width:100%;margin-top:6px;background:#000;color:#fff;border:1px solid #333;border-radius:8px;padding:8px}
+.remove{position:absolute;top:6px;right:6px;background:#ff5252;border:none;border-radius:6px}
+.card{background:#111;padding:12px;border-radius:12px;margin-bottom:10px;cursor:pointer}
+pre{background:#000;padding:10px;border-radius:10px}
 </style>
 </head>
 <body>
 
 <header>
-<div id="logo"><img src="logo.png"></div>
-<button id="loginBtn">Login</button>
-<button id="logoutBtn" style="display:none">Logout</button>
+<button id="login">Login</button>
+<button id="logout" style="display:none">Logout</button>
 </header>
 
 <main>
-<div class="upload" id="uploadBox">
-<input id="packTitle" placeholder="Script Pack Title">
+<div class="upload" id="upload">
+<input id="packTitle" placeholder="Pack title">
 <div id="editors"></div>
-<button class="addBtn" id="addScript">Add One More Script</button>
-<button class="uploadBtn" id="savePack">Save Script Pack</button>
+<button onclick="addEditor()">Add Script</button>
+<button onclick="savePack()">Save Pack</button>
 </div>
-<div class="grid" id="list"></div>
+<div id="list"></div>
 </main>
-
-<div class="modal" id="viewModal">
-<div class="view">
-<h2 id="viewTitle"></h2>
-<div id="viewScripts"></div>
-<button class="uploadBtn" id="editPack">Edit</button>
-<button class="danger" id="deletePack">Delete</button>
-<button class="addBtn" onclick="viewModal.style.display='none'">Close</button>
-</div>
-</div>
 
 <script>
 const ADMIN_PASSWORD="AshDevYTERISANIMEFUN"
+const RAW_URL="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/scripts.json"
+const API_URL="https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/contents/scripts.json"
+const TOKEN="PASTE_TOKEN_HERE"
 
-const GITHUB_RAW_URL="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/scripts.json"
-const GITHUB_API_URL="https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/contents/scripts.json"
-const GITHUB_TOKEN="PASTE_TOKEN_HERE"
-
-const users=JSON.parse(localStorage.getItem("users")||"{}")
-let currentUser=localStorage.getItem("currentUser")
+let users=JSON.parse(localStorage.getItem("users")||"{}")
+let user=localStorage.getItem("user")
 let packs=[]
-let activeIndex=null
 
-const loginBtn=document.getElementById("loginBtn")
-const logoutBtn=document.getElementById("logoutBtn")
-const uploadBox=document.getElementById("uploadBox")
-const editors=document.getElementById("editors")
-
-loginBtn.onclick=()=>{
-  const u=prompt("Username")
-  const p=prompt("Password")
-  if(!users[u]) users[u]={password:p,role:"viewer"}
-  if(users[u].password!==p) return alert("Wrong password")
-  if(p===ADMIN_PASSWORD) users[u].role="admin"
+login.onclick=()=>{
+  let u=prompt("Username")
+  let p=prompt("Password")
+  if(!users[u]) users[u]={p,admin:p===ADMIN_PASSWORD}
+  if(users[u].p!==p) return alert("Wrong")
+  user=u
+  localStorage.setItem("user",u)
   localStorage.setItem("users",JSON.stringify(users))
-  localStorage.setItem("currentUser",u)
-  currentUser=u
-  applyRole()
+  apply()
 }
+logout.onclick=()=>{localStorage.clear();location.reload()}
 
-logoutBtn.onclick=()=>{
-  localStorage.removeItem("currentUser")
-  location.reload()
+function apply(){
+  login.style.display="none"
+  logout.style.display="block"
+  upload.style.display=users[user].admin?"block":"none"
 }
+if(user&&users[user]) apply()
 
-function applyRole(){
-  loginBtn.style.display="none"
-  logoutBtn.style.display="inline-block"
-  uploadBox.style.display=users[currentUser].role==="admin"?"block":"none"
-}
-if(currentUser&&users[currentUser]) applyRole()
-
-function addEditor(data){
-  const d=document.createElement("div")
+function addEditor(t="",c=""){
+  let d=document.createElement("div")
   d.className="scriptEditor"
-
-  const r=document.createElement("button")
-  r.className="removeBtn"
-  r.textContent="X"
-  r.onclick=()=>d.remove()
-
-  const t=document.createElement("input")
-  t.placeholder="Script title"
-
-  const c=document.createElement("textarea")
-
-  if(data){t.value=data.title;c.value=data.code}
-
-  d.appendChild(r)
-  d.appendChild(t)
-  d.appendChild(c)
+  d.innerHTML=`<button class="remove" onclick="this.parentNode.remove()">X</button>
+  <input placeholder="Script title" value="${t}">
+  <textarea placeholder="Code">${c}</textarea>`
   editors.appendChild(d)
 }
 addEditor()
-addScript.onclick=()=>addEditor()
 
-async function loadPacks(){
-  const r=await fetch(GITHUB_RAW_URL)
+async function load(){
+  let r=await fetch(RAW_URL)
   packs=await r.json()
-  render()
-}
-loadPacks()
-
-function render(){
   list.innerHTML=""
   packs.forEach((p,i)=>{
-    const d=document.createElement("div")
+    let d=document.createElement("div")
     d.className="card"
     d.textContent=p.title
-    d.onclick=()=>openPack(i)
+    d.onclick=()=>alert(JSON.stringify(p,null,2))
     list.appendChild(d)
   })
 }
+load()
 
-function openPack(i){
-  activeIndex=i
-  const p=packs[i]
-  viewTitle.textContent=p.title
-  viewScripts.innerHTML=""
-  p.scripts.forEach(s=>{
-    const b=document.createElement("div")
-    b.className="scriptBlock"
-    b.innerHTML=`<h4>${s.title}</h4><pre>${s.code}</pre>`
-    const c=document.createElement("button")
-    c.className="copyBtn"
-    c.textContent="Copy"
-    c.onclick=()=>navigator.clipboard.writeText(s.code)
-    b.appendChild(c)
-    viewScripts.appendChild(b)
+async function savePack(){
+  let scripts=[]
+  editors.querySelectorAll(".scriptEditor").forEach(e=>{
+    let t=e.children[1].value.trim()
+    let c=e.children[2].value.trim()
+    if(t&&c) scripts.push({title:t,code:c})
   })
-  const admin=currentUser&&users[currentUser].role==="admin"
-  editPack.style.display=admin?"block":"none"
-  deletePack.style.display=admin?"block":"none"
-  viewModal.style.display="flex"
-}
-
-editPack.onclick=()=>{
-  const p=packs[activeIndex]
-  viewModal.style.display="none"
-  uploadBox.style.display="block"
-  packTitle.value=p.title
-  editors.innerHTML=""
-  p.scripts.forEach(s=>addEditor(s))
+  if(!scripts.length) return alert("No scripts")
+  packs.unshift({title:packTitle.value,scripts})
+  await saveGitHub()
 }
 
 async function saveGitHub(){
-  const meta=await fetch(GITHUB_API_URL,{
-    headers:{
-      "Authorization":"Bearer "+GITHUB_TOKEN,
-      "Accept":"application/vnd.github+json"
-    }
-  })
-  const info=await meta.json()
+  let sha=null
+  let meta=await fetch(API_URL,{headers:{
+    Authorization:"Bearer "+TOKEN,
+    Accept:"application/vnd.github+json"
+  }})
 
-  await fetch(GITHUB_API_URL,{
+  if(meta.ok){
+    let j=await meta.json()
+    sha=j.sha
+  }
+
+  let body={
+    message:"update scripts",
+    content:btoa(unescape(encodeURIComponent(JSON.stringify(packs,null,2))))
+  }
+  if(sha) body.sha=sha
+
+  let res=await fetch(API_URL,{
     method:"PUT",
     headers:{
-      "Authorization":"Bearer "+GITHUB_TOKEN,
-      "Accept":"application/vnd.github+json",
+      Authorization:"Bearer "+TOKEN,
+      Accept:"application/vnd.github+json",
       "Content-Type":"application/json"
     },
-    body:JSON.stringify({
-      message:"update scripts",
-      content:btoa(unescape(encodeURIComponent(JSON.stringify(packs,null,2)))),
-      sha:info.sha
-    })
+    body:JSON.stringify(body)
   })
-  location.reload()
-}
 
-savePack.onclick=()=>{
-  if(users[currentUser].role!=="admin") return
-  const scripts=[]
-  editors.querySelectorAll(".scriptEditor").forEach(e=>{
-    const t=e.querySelector("input").value.trim()
-    const c=e.querySelector("textarea").value.trim()
-    if(t&&c) scripts.push({title:t,code:c})
-  })
-  if(!scripts.length) return alert("Add scripts")
-  if(activeIndex!==null){
-    packs[activeIndex]={title:packTitle.value,scripts}
-    activeIndex=null
-  }else{
-    packs.unshift({title:packTitle.value,scripts})
+  if(!res.ok){
+    alert("UPLOAD FAILED")
+    console.log(await res.text())
+    return
   }
-  saveGitHub()
-}
 
-deletePack.onclick=()=>{
-  packs.splice(activeIndex,1)
-  saveGitHub()
+  location.reload()
 }
 </script>
 </body>
