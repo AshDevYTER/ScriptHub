@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,111 +8,194 @@
 <link rel="apple-touch-icon" href="logo.png">
 <style>
 *{box-sizing:border-box;font-family:Inter,system-ui,Arial}
-html,body{width:100%;height:100%}
-body{margin:0;background:radial-gradient(1200px 600px at 20% -10%,#1b1b1b,#0b0b0b);color:#fff;overflow:hidden}
-header{display:flex;align-items:center;gap:14px;padding:14px 18px;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);position:fixed;top:0;left:0;right:0;z-index:10}
-#logoWrap{width:42px;height:42px;border-radius:50%;overflow:hidden;flex-shrink:0}
-#logoWrap img{width:100%;height:100%;object-fit:cover;border-radius:50%}
-header input{flex:1;background:#0f0f0f;border:1px solid #222;color:#fff;padding:12px 16px;border-radius:14px}
-header button{background:linear-gradient(135deg,#4fc3f7,#81c784);border:none;color:#000;padding:12px 18px;border-radius:14px;font-weight:700;cursor:pointer}
-main{position:absolute;top:74px;left:0;right:0;bottom:0;padding:20px;overflow-y:auto}
-.upload{background:#121212;border:1px solid #1f1f1f;border-radius:18px;padding:18px;margin-bottom:22px;display:none}
-.scriptBoxes{display:flex;flex-direction:column;gap:12px}
-.scriptBox{background:#0c0c0c;border:1px solid #222;border-radius:16px;padding:14px}
-.scriptBox input,.scriptBox textarea{width:100%;background:#080808;border:1px solid #222;color:#fff;padding:10px;border-radius:12px;margin-bottom:8px}
-.scriptBox textarea{min-height:120px}
-.scriptBox button{background:#1f1f1f;border:1px solid #333;color:#fff;padding:8px 12px;border-radius:10px;cursor:pointer}
-.addBtn{width:100%;margin:14px 0;background:#111;border:1px dashed #333;color:#aaa;padding:12px;border-radius:14px;cursor:pointer}
-.uploadAll{width:100%;background:linear-gradient(135deg,#4fc3f7,#81c784);border:none;color:#000;padding:14px;border-radius:16px;font-size:16px;font-weight:800;cursor:pointer}
-.list{display:flex;flex-direction:column;gap:14px}
-.card{background:#151515;border:1px solid #1f1f1f;border-radius:16px;padding:16px;cursor:pointer}
-.card h3{margin:0 0 6px 0}
-.card span{font-size:13px;color:#aaa}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:50}
-.view{width:100%;max-width:900px;height:90vh;background:#0b0b0b;border:1px solid #242424;border-radius:22px;padding:20px;display:flex;flex-direction:column}
-.viewHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.viewHeader button{background:#111;border:1px solid #333;color:#fff;padding:8px 14px;border-radius:10px;cursor:pointer}
-.delete{border-color:#ff5252;color:#ff5252}
-pre{flex:1;background:#000;border-radius:16px;border:1px solid #1f1f1f;padding:18px;overflow:auto;font-family:Consolas,monospace;font-size:14px;white-space:pre-wrap}
+body{margin:0;background:#0b0b0b;color:#fff}
+header{display:flex;align-items:center;gap:12px;padding:14px 18px;background:#000;position:fixed;top:0;left:0;right:0}
+#logoWrap{width:40px;height:40px;border-radius:50%;overflow:hidden}
+#logoWrap img{width:100%;height:100%;object-fit:cover}
+header button{background:#4fc3f7;border:none;padding:10px 16px;border-radius:12px;font-weight:700;cursor:pointer}
+main{margin-top:70px;padding:20px}
+.upload{display:none;background:#111;padding:16px;border-radius:14px;margin-bottom:20px}
+.scriptEditor{background:#0c0c0c;border:1px solid #222;border-radius:12px;padding:12px;margin-bottom:10px}
+.scriptEditor textarea{width:100%;min-height:120px;background:#000;color:#fff;border:1px solid #333;border-radius:10px;padding:10px}
+.addBtn,.uploadBtn{width:100%;margin-top:10px;background:#4fc3f7;border:none;padding:12px;border-radius:12px;font-weight:700;cursor:pointer}
+.card{background:#111;border-radius:14px;padding:14px;margin-bottom:12px;cursor:pointer}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center}
+.view{background:#000;width:90%;max-width:800px;padding:16px;border-radius:16px}
+.scriptBlock{margin-bottom:14px}
+.scriptBlock pre{background:#111;padding:12px;border-radius:10px;white-space:pre-wrap}
+.copyBtn{margin-top:6px;background:#333;color:#fff;border:none;padding:6px 10px;border-radius:8px;cursor:pointer}
+.deleteBtn{background:#ff5252;border:none;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer;margin-top:10px}
 </style>
 </head>
 <body>
+
 <header>
-<div id="logoWrap"><img id="logoImg"></div>
-<input id="search" placeholder="Search scripts...">
+<div id="logoWrap"><img src="logo.png"></div>
 <button id="loginBtn">Login</button>
 <button id="logoutBtn" style="display:none">Logout</button>
 </header>
+
 <main>
 <div class="upload" id="uploadBox">
-<div class="scriptBoxes" id="scriptBoxes"></div>
-<button class="addBtn" id="addBox">+ Add Script Box</button>
-<button class="uploadAll" id="uploadBtn">Upload All Scripts</button>
+<input id="packTitle" placeholder="Script Pack Title" style="width:100%;padding:10px;margin-bottom:10px">
+<div id="editors"></div>
+<button class="addBtn" id="addEditor">Add One More Script</button>
+<button class="uploadBtn" id="uploadPack">Upload Script Pack</button>
 </div>
-<div class="list" id="list"></div>
+<div id="list"></div>
 </main>
-<div class="modal" id="loginModal">
-<div class="view" style="max-width:420px;height:auto">
-<h2>Login</h2>
-<input id="usernameInput" placeholder="Username" style="margin-bottom:10px">
-<input id="passwordInput" type="password" placeholder="Password" style="margin-bottom:10px">
-<button id="loginSubmit">Continue</button>
-</div>
-</div>
+
 <div class="modal" id="viewModal">
 <div class="view">
-<div class="viewHeader">
 <h2 id="viewTitle"></h2>
-<div>
-<button id="copyBtn">Copy</button>
-<button id="deleteBtn" class="delete">Delete</button>
-<button id="closeBtn">Close</button>
+<div id="viewScripts"></div>
+<button class="uploadBtn" id="editBtn">Edit</button>
+<button class="deleteBtn" id="deleteBtn">Delete</button>
+<button class="uploadBtn" onclick="viewModal.style.display='none'">Close</button>
 </div>
 </div>
-<pre id="viewCode"></pre>
-</div>
-</div>
+
 <script>
-'use strict'
-var logoImg=document.getElementById('logoImg')
-logoImg.src='logo.png'
-logoImg.onerror=function(){this.src='https://via.placeholder.com/64'}
 var ADMIN_PASSWORD='AshDevYTERISANIMEFUN'
+
+var GITHUB_RAW_URL='https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/scripts.json'
+var GITHUB_API_URL='https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/contents/scripts.json'
+var GITHUB_TOKEN='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'
+
 var users=JSON.parse(localStorage.getItem('users')||'{}')
 var currentUser=localStorage.getItem('currentUser')
-var scripts=JSON.parse(localStorage.getItem('scripts')||'[]')
+
 var loginBtn=document.getElementById('loginBtn')
 var logoutBtn=document.getElementById('logoutBtn')
-var loginModal=document.getElementById('loginModal')
-var loginSubmit=document.getElementById('loginSubmit')
 var uploadBox=document.getElementById('uploadBox')
-var uploadBtn=document.getElementById('uploadBtn')
-var addBox=document.getElementById('addBox')
-var scriptBoxes=document.getElementById('scriptBoxes')
-var list=document.getElementById('list')
+
+loginBtn.onclick=function(){
+var u=prompt('Username')
+var p=prompt('Password')
+if(!users[u]) users[u]={password:p,role:'viewer'}
+if(users[u].password!==p) return
+if(p===ADMIN_PASSWORD) users[u].role='admin'
+localStorage.setItem('users',JSON.stringify(users))
+localStorage.setItem('currentUser',u)
+currentUser=u
+applyRole()
+}
+
+logoutBtn.onclick=function(){
+localStorage.removeItem('currentUser')
+location.reload()
+}
+
+function applyRole(){
+loginBtn.style.display='none'
+logoutBtn.style.display='inline-block'
+uploadBox.style.display=users[currentUser].role==='admin'?'block':'none'
+}
+
+if(currentUser&&users[currentUser]) applyRole()
+
+var editors=document.getElementById('editors')
+function addEditor(v){
+var d=document.createElement('div')
+d.className='scriptEditor'
+d.innerHTML='<textarea>'+ (v||'') +'</textarea>'
+editors.appendChild(d)
+}
+addEditor()
+document.getElementById('addEditor').onclick=function(){addEditor()}
+
+var packs=[]
+async function loadPacks(){
+var r=await fetch(GITHUB_RAW_URL)
+if(!r.ok) return
+packs=await r.json()
+renderList()
+}
+loadPacks()
+
+function renderList(){
+list.innerHTML=''
+packs.forEach((p,i)=>{
+var d=document.createElement('div')
+d.className='card'
+d.textContent=p.title
+d.onclick=function(){openPack(i)}
+list.appendChild(d)
+})
+}
+
+var activeIndex=null
 var viewModal=document.getElementById('viewModal')
 var viewTitle=document.getElementById('viewTitle')
-var viewCode=document.getElementById('viewCode')
-var copyBtn=document.getElementById('copyBtn')
+var viewScripts=document.getElementById('viewScripts')
+var editBtn=document.getElementById('editBtn')
 var deleteBtn=document.getElementById('deleteBtn')
-var closeBtn=document.getElementById('closeBtn')
-var activeId=null
-function createBox(){var d=document.createElement('div');d.className='scriptBox';d.innerHTML='<input placeholder="Script title"><textarea placeholder="Script code"></textarea><button>Remove</button>';d.querySelector('button').onclick=function(){d.remove()};scriptBoxes.appendChild(d)}
-addBox.onclick=createBox
-createBox()
-loginBtn.onclick=function(){loginModal.style.display='flex'}
-logoutBtn.onclick=function(){localStorage.removeItem('currentUser');currentUser=null;loginBtn.style.display='inline-block';logoutBtn.style.display='none';uploadBox.style.display='none'}
-loginSubmit.onclick=function(){var u=usernameInput.value.trim();var p=passwordInput.value;if(!u||!p)return;if(!users[u])users[u]={password:p,role:'viewer'};if(users[u].password!==p){alert('Wrong password');return}if(p===ADMIN_PASSWORD)users[u].role='admin';localStorage.setItem('users',JSON.stringify(users));localStorage.setItem('currentUser',u);currentUser=u;loginModal.style.display='none';applyRole()}
-function applyRole(){if(!currentUser||!users[currentUser])return;loginBtn.style.display='none';logoutBtn.style.display='inline-block';uploadBox.style.display=users[currentUser].role==='admin'?'block':'none'}
-if(currentUser&&users[currentUser])applyRole()
-uploadBtn.onclick=function(){if(!currentUser||users[currentUser].role!=='admin')return;Array.from(scriptBoxes.children).forEach(function(b){var t=b.querySelector('input').value.trim();var c=b.querySelector('textarea').value.trim();if(!t||!c)return;scripts.unshift({id:Date.now().toString(36)+Math.random().toString(36).slice(2),title:t,code:c,date:new Date().toLocaleDateString()})});localStorage.setItem('scripts',JSON.stringify(scripts));scriptBoxes.innerHTML='';createBox();render()}
-function render(){list.innerHTML='';scripts.forEach(function(s){var d=document.createElement('div');d.className='card';d.innerHTML='<h3>'+s.title+'</h3><span>'+s.date+'</span>';d.onclick=function(){open(s.id)};list.appendChild(d)})}
-function open(id){var s=scripts.find(x=>x.id===id);if(!s)return;activeId=id;viewTitle.textContent=s.title;viewCode.textContent=s.code;deleteBtn.style.display=currentUser&&users[currentUser].role==='admin'?'inline-block':'none';viewModal.style.display='flex'}
-copyBtn.onclick=function(){navigator.clipboard.writeText(viewCode.textContent)}
-deleteBtn.onclick=function(){if(!activeId)return;scripts=scripts.filter(x=>x.id!==activeId);localStorage.setItem('scripts',JSON.stringify(scripts));viewModal.style.display='none';render()}
-closeBtn.onclick=function(){viewModal.style.display='none'}
-search.oninput=function(){var v=search.value.toLowerCase();Array.from(list.children).forEach(function(c){c.style.display=c.innerText.toLowerCase().includes(v)?'block':'none'})}
-render()
+
+function openPack(i){
+activeIndex=i
+var p=packs[i]
+viewTitle.textContent=p.title
+viewScripts.innerHTML=''
+p.scripts.forEach(sc=>{
+var b=document.createElement('div')
+b.className='scriptBlock'
+b.innerHTML='<pre>'+sc+'</pre>'
+var c=document.createElement('button')
+c.className='copyBtn'
+c.textContent='Copy'
+c.onclick=function(){navigator.clipboard.writeText(sc)}
+b.appendChild(c)
+viewScripts.appendChild(b)
+})
+var isAdmin=currentUser&&users[currentUser].role==='admin'
+editBtn.style.display=isAdmin?'block':'none'
+deleteBtn.style.display=isAdmin?'block':'none'
+viewModal.style.display='flex'
+}
+
+editBtn.onclick=function(){
+var p=packs[activeIndex]
+viewModal.style.display='none'
+uploadBox.style.display='block'
+packTitle.value=p.title
+editors.innerHTML=''
+p.scripts.forEach(s=>addEditor(s))
+}
+
+async function saveToGitHub(){
+var content=btoa(unescape(encodeURIComponent(JSON.stringify(packs,null,2))))
+var sha=null
+var r=await fetch(GITHUB_API_URL,{headers:{Authorization:'token '+GITHUB_TOKEN}})
+if(r.ok){var j=await r.json();sha=j.sha}
+await fetch(GITHUB_API_URL,{
+method:'PUT',
+headers:{Authorization:'token '+GITHUB_TOKEN,'Content-Type':'application/json'},
+body:JSON.stringify({message:'update scripts',content:content,sha:sha})
+})
+location.reload()
+}
+
+document.getElementById('uploadPack').onclick=function(){
+if(!currentUser||users[currentUser].role!=='admin') return
+var title=packTitle.value.trim()
+if(!title) return
+var scripts=[]
+editors.querySelectorAll('textarea').forEach(t=>{if(t.value.trim()) scripts.push(t.value)})
+if(!scripts.length) return
+if(activeIndex!==null){
+packs[activeIndex]={title:title,scripts:scripts}
+activeIndex=null
+}else{
+packs.unshift({title:title,scripts:scripts})
+}
+saveToGitHub()
+}
+
+deleteBtn.onclick=function(){
+if(activeIndex===null) return
+packs.splice(activeIndex,1)
+saveToGitHub()
+}
 </script>
 </body>
 </html>
