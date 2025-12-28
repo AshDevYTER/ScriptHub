@@ -98,7 +98,26 @@ logoutBtn.onclick=function(){localStorage.removeItem('currentUser');currentUser=
 loginSubmit.onclick=function(){var u=usernameInput.value.trim();var p=passwordInput.value;if(!u||!p)return;if(!users[u])users[u]={password:p,role:'viewer'};if(users[u].password!==p)return;if(p===ADMIN_PASSWORD)users[u].role='admin';localStorage.setItem('users',JSON.stringify(users));localStorage.setItem('currentUser',u);currentUser=u;loginModal.style.display='none';applyRole()}
 function applyRole(){if(!currentUser)return;loginBtn.style.display='none';logoutBtn.style.display='inline-block';uploadBox.style.display=users[currentUser].role==='admin'?'block':'none'}
 if(currentUser&&users[currentUser])applyRole()
-uploadBtn.onclick=function(){if(!currentUser||users[currentUser].role!=='admin')return;var t=title.value.trim();var c=code.value;if(!t||!c)return;scripts.unshift({id:Date.now().toString(36),title:t,code:c,date:new Date().toLocaleDateString()});localStorage.setItem('scripts',JSON.stringify(scripts));title.value='';code.value='';render()}
+uploadBtn.onclick=function(){
+if(!currentUser||users[currentUser].role!=='admin')return
+var raw=code.value.trim()
+if(!raw)return
+var blocks=raw.split(/
+-{3,}
+/)
+blocks.forEach(function(block){
+var lines=block.trim().split('
+')
+if(lines.length===0)return
+var t=lines[0].trim()||'Untitled Script'
+var c=block.trim()
+scripts.unshift({id:Date.now().toString(36)+Math.random().toString(36).slice(2),title:t,code:c,date:new Date().toLocaleDateString()})
+})
+localStorage.setItem('scripts',JSON.stringify(scripts))
+code.value=''
+title.value=''
+render()
+}
 function render(){list.innerHTML='';scripts.forEach(function(s){var d=document.createElement('div');d.className='card';d.innerHTML='<h3>'+s.title+'</h3><span>'+s.date+'</span>';d.onclick=function(){open(s.id)};list.appendChild(d)})}
 function open(id){var s=scripts.find(x=>x.id===id);if(!s)return;activeId=id;viewTitle.textContent=s.title;viewCode.textContent=s.code;deleteBtn.style.display=currentUser&&users[currentUser].role==='admin'?'inline-block':'none';viewModal.style.display='flex'}
 copyBtn.onclick=function(){navigator.clipboard.writeText(viewCode.textContent)}
