@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Script Hub</title>
+  <style>
+    *{box-sizing:border-box;font-family:Inter,system-ui,Arial}
+    html,body{width:100%;height:100%}
+    body{margin:0;background:radial-gradient(1200px 600px at 20% -10%,#1b1b1b,#0b0b0b);color:#fff;overflow:hidden}
+
+    header{display:flex;align-items:center;gap:14px;padding:14px 18px;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);position:fixed;top:0;left:0;right:0;z-index:10}
+
+    #logoWrap{width:42px;height:42px;border-radius:50%;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#4fc3f7,#81c784);display:flex;align-items:center;justify-content:center}
+    #logoWrap img{width:100%;height:100%;object-fit:cover;display:block}
+
+    header input{flex:1;background:#0f0f0f;border:1px solid #222;color:#fff;padding:12px 16px;border-radius:14px;outline:none}
+    header button{background:linear-gradient(135deg,#4fc3f7,#81c784);border:none;color:#000;padding:12px 18px;border-radius:14px;font-weight:700;cursor:pointer}
+
+    #logoutBtn{display:none}
+
+    main{position:absolute;top:74px;left:0;right:0;bottom:0;padding:20px;overflow-y:auto}
+
+    .upload{background:linear-gradient(180deg,#151515,#0d0d0d);border:1px solid #1f1f1f;border-radius:20px;padding:18px;margin-bottom:22px;display:none}
+
+    .upload input,.upload textarea{width:100%;margin-bottom:12px;background:#0c0c0c;border:1px solid #222;color:#fff;padding:12px;border-radius:14px;outline:none}
+    .upload textarea{min-height:160px;resize:vertical}
+    .upload button{width:100%;background:linear-gradient(135deg,#4fc3f7,#81c784);border:none;color:#000;padding:14px;border-radius:16px;font-size:16px;font-weight:800;cursor:pointer}
+
+    /* LOGIN MODAL */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(14px);display:none;z-index:50;align-items:center;justify-content:center}
+    .modalCard{width:100%;max-width:420px;background:linear-gradient(180deg,#181818,#0f0f0f);border:1px solid #242424;border-radius:22px;padding:26px}
+    .modalTitle{font-size:22px;font-weight:800;margin-bottom:6px}
+    .modalSub{font-size:13px;color:#aaa;margin-bottom:18px}
+    .modalCard input{width:100%;background:#0b0b0b;border:1px solid #262626;color:#fff;padding:14px;border-radius:14px;margin-bottom:12px;outline:none}
+    .modalPrimary{width:100%;background:linear-gradient(135deg,#4fc3f7,#81c784);border:none;color:#000;padding:14px;border-radius:16px;font-size:16px;font-weight:800;cursor:pointer}
+
+  </style>
+</head>
+<body>
+
+<header>
+  <div id="logoWrap"><img id="logoImg"></div>
+  <input id="search" placeholder="Search scripts...">
+  <button id="loginBtn">Login</button>
+  <button id="logoutBtn">Logout</button>
+</header>
+
+<main>
+  <div class="upload" id="uploadBox">
+    <input id="title" placeholder="Script title">
+    <textarea id="code" placeholder="Paste your script here"></textarea>
+    <button id="uploadBtn">Upload Script</button>
+  </div>
+</main>
+
+<!-- LOGIN MODAL -->
+<div class="modal" id="loginModal">
+  <div class="modalCard">
+    <div class="modalTitle">Welcome Back</div>
+    <div class="modalSub">Login or create your account</div>
+    <input id="usernameInput" placeholder="Username">
+    <input id="passwordInput" type="password" placeholder="Password">
+    <button class="modalPrimary" id="loginSubmit">Continue</button>
+  </div>
+</div>
+
+<script>
+'use strict'
+
+// LOGO
+var logoImg = document.getElementById('logoImg')
+logoImg.src = 'data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#4fc3f7"/><stop offset="1" stop-color="#81c784"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><text x="50%" y="55%" font-size="24" fill="#000" text-anchor="middle">SH</text></svg>')
+
+// AUTH (PERSISTENT)
+var ADMIN_PASSWORD = 'AshDevYTERISANIMEFUN'
+var users = JSON.parse(localStorage.getItem('users') || '{}')
+var currentUser = localStorage.getItem('currentUser')
+
+var loginModal = document.getElementById('loginModal')
+var loginBtn = document.getElementById('loginBtn')
+var logoutBtn = document.getElementById('logoutBtn')
+var loginSubmit = document.getElementById('loginSubmit')
+var uploadBox = document.getElementById('uploadBox')
+
+loginBtn.onclick = function(){ loginModal.style.display = 'flex' }
+loginSubmit.onclick = login
+logoutBtn.onclick = logout
+
+function login(){
+  var u = usernameInput.value.trim()
+  var p = passwordInput.value
+  if(!u || !p) return
+
+  if(!users[u]) users[u] = { password:p, role:'viewer' }
+  if(users[u].password !== p){ alert('Wrong password'); return }
+  if(p === ADMIN_PASSWORD) users[u].role = 'admin'
+
+  localStorage.setItem('users', JSON.stringify(users))
+  localStorage.setItem('currentUser', u)
+  currentUser = u
+  applyRole()
+  loginModal.style.display = 'none'
+}
+
+function logout(){
+  localStorage.removeItem('currentUser')
+  currentUser = null
+  loginBtn.style.display = 'inline-block'
+  logoutBtn.style.display = 'none'
+  uploadBox.style.display = 'none'
+  loginBtn.textContent = 'Login'
+}
+
+function applyRole(){
+  if(!currentUser || !users[currentUser]) return
+  var r = users[currentUser].role
+  loginBtn.style.display = 'none'
+  logoutBtn.style.display = 'inline-block'
+  logoutBtn.textContent = 'Logout (' + currentUser + ')'
+  uploadBox.style.display = r === 'admin' ? 'block' : 'none'
+}
+
+// AUTO LOGIN ON REFRESH
+if(currentUser && users[currentUser]){
+  applyRole()
+}
+
+</script>
+</body>
+</html>
