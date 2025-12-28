@@ -1,122 +1,111 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Script Hub</title>
-  <link rel="icon" type="image/png" href="logo.png">
-  <style>
-    *{box-sizing:border-box;font-family:Inter,system-ui,Arial}
-    html,body{width:100%;height:100%}
-    body{margin:0;background:radial-gradient(1200px 600px at 20% -10%,#1b1b1b,#0b0b0b);color:#fff;overflow:hidden}header{display:flex;align-items:center;gap:14px;padding:14px 18px;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);position:fixed;top:0;left:0;right:0;z-index:10}
-
-#logoWrap{width:42px;height:42px;border-radius:50%;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#4fc3f7,#81c784);display:flex;align-items:center;justify-content:center}
-#logoWrap img{
-
-width:100%; height:100%; object-fit:cover; display:block; border-radius:50%; }
-
-header input{flex:1;background:#0f0f0f;border:1px solid #222;color:#fff;padding:12px 16px;border-radius:14px;outline:none}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Script Hub</title>
+<link rel="icon" href="logo.png?v=3" sizes="32x32" type="image/png">
+<link rel="icon" href="logo.png?v=3" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="logo.png?v=3">
+<style>
+*{box-sizing:border-box;font-family:Inter,system-ui,Arial}
+html,body{width:100%;height:100%}
+body{margin:0;background:radial-gradient(1200px 600px at 20% -10%,#1b1b1b,#0b0b0b);color:#fff;overflow:hidden}
+header{display:flex;align-items:center;gap:14px;padding:14px 18px;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);position:fixed;top:0;left:0;right:0;z-index:10}
+#logoWrap{width:42px;height:42px;border-radius:50%;overflow:hidden;flex-shrink:0}
+#logoWrap img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+header input{flex:1;background:#0f0f0f;border:1px solid #222;color:#fff;padding:12px 16px;border-radius:14px}
 header button{background:linear-gradient(135deg,#4fc3f7,#81c784);border:none;color:#000;padding:12px 18px;border-radius:14px;font-weight:700;cursor:pointer}
-
-#logoutBtn{display:none}
-
 main{position:absolute;top:74px;left:0;right:0;bottom:0;padding:20px;overflow-y:auto}
-
-.upload{background:linear-gradient(180deg,#151515,#0d0d0d);border:1px solid #1f1f1f;border-radius:20px;padding:18px;margin-bottom:22px;display:none}
-
-.upload input,.upload textarea{width:100%;margin-bottom:12px;background:#0c0c0c;border:1px solid #222;color:#fff;padding:12px;border-radius:14px;outline:none}
-.upload textarea{min-height:160px;resize:vertical}
+.upload{background:#121212;border:1px solid #1f1f1f;border-radius:18px;padding:18px;margin-bottom:22px;display:none;animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+.upload input,.upload textarea{width:100%;margin-bottom:12px;background:#0c0c0c;border:1px solid #222;color:#fff;padding:12px;border-radius:14px}
+.upload textarea{min-height:180px}
 .upload button{width:100%;background:linear-gradient(135deg,#4fc3f7,#81c784);border:none;color:#000;padding:14px;border-radius:16px;font-size:16px;font-weight:800;cursor:pointer}
-
-/* LOGIN MODAL */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(14px);display:none;z-index:50;align-items:center;justify-content:center}
-.modalCard{width:100%;max-width:420px;background:linear-gradient(180deg,#181818,#0f0f0f);border:1px solid #242424;border-radius:22px;padding:26px}
-.modalTitle{font-size:22px;font-weight:800;margin-bottom:6px}
-.modalSub{font-size:13px;color:#aaa;margin-bottom:18px}
-.modalCard input{width:100%;background:#0b0b0b;border:1px solid #262626;color:#fff;padding:14px;border-radius:14px;margin-bottom:12px;outline:none}
-.modalPrimary{width:100%;background:linear-gradient(135deg,#4fc3f7,#81c784);border:none;color:#000;padding:14px;border-radius:16px;font-size:16px;font-weight:800;cursor:pointer}
-
-  </style>
+.list{display:flex;flex-direction:column;gap:14px}
+.card{background:#151515;border:1px solid #1f1f1f;border-radius:16px;padding:16px;cursor:pointer;animation:fade .25s ease}
+.card:hover{background:#1b1b1b}
+.card h3{margin:0 0 6px 0}
+.card span{font-size:13px;color:#aaa}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(14px);display:none;align-items:center;justify-content:center;z-index:50}
+.view{width:100%;max-width:900px;height:90vh;background:#0b0b0b;border:1px solid #242424;border-radius:22px;padding:20px;display:flex;flex-direction:column;animation:fade .25s ease}
+.viewHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.viewHeader button{background:#111;border:1px solid #333;color:#fff;padding:8px 14px;border-radius:10px;cursor:pointer}
+.delete{border-color:#ff5252;color:#ff5252}
+pre{flex:1;background:#000;border-radius:16px;border:1px solid #1f1f1f;padding:18px;overflow:auto;font-family:Consolas,monospace;font-size:14px;white-space:pre-wrap}
+</style>
 </head>
-<body><header>
-  <div id="logoWrap"><img id="logoImg"></div>
-  <input id="search" placeholder="Search scripts...">
-  <button id="loginBtn">Login</button>
-  <button id="logoutBtn">Logout</button>
-</header><main>
-  <div class="upload" id="uploadBox">
-    <input id="title" placeholder="Script title">
-    <textarea id="code" placeholder="Paste your script here"></textarea>
-    <button id="uploadBtn">Upload Script</button>
-  </div>
-</main><!-- LOGIN MODAL --><div class="modal" id="loginModal">
-  <div class="modalCard">
-    <div class="modalTitle">Welcome Back</div>
-    <div class="modalSub">Login or create your account</div>
-    <input id="usernameInput" placeholder="Username">
-    <input id="passwordInput" type="password" placeholder="Password">
-    <button class="modalPrimary" id="loginSubmit">Continue</button>
-  </div>
-</div><script>
+<body>
+<header>
+<div id="logoWrap"><img id="logoImg"></div>
+<input id="search" placeholder="Search scripts...">
+<button id="loginBtn">Login</button>
+<button id="logoutBtn" style="display:none">Logout</button>
+</header>
+<main>
+<div class="upload" id="uploadBox">
+<input id="title" placeholder="Script title">
+<textarea id="code" placeholder="Paste multiple scripts here"></textarea>
+<button id="uploadBtn">Upload</button>
+</div>
+<div class="list" id="list"></div>
+</main>
+<div class="modal" id="loginModal">
+<div class="view" style="max-width:420px;height:auto">
+<h2>Login</h2>
+<input id="usernameInput" placeholder="Username" style="margin-bottom:10px">
+<input id="passwordInput" type="password" placeholder="Password" style="margin-bottom:10px">
+<button id="loginSubmit">Continue</button>
+</div>
+</div>
+<div class="modal" id="viewModal">
+<div class="view">
+<div class="viewHeader">
+<h2 id="viewTitle"></h2>
+<div>
+<button id="copyBtn">Copy</button>
+<button id="deleteBtn" class="delete">Delete</button>
+<button id="closeBtn">Close</button>
+</div>
+</div>
+<pre id="viewCode"></pre>
+</div>
+</div>
+<script>
 'use strict'
-
-// LOGO
-var logoImg = document.getElementById('logoImg')
-// Replace the logo with your custom image
-logoImg.src = 'logo.png'
-
-// AUTH (PERSISTENT)
-var ADMIN_PASSWORD = 'AshDevYTERISANIMEFUN'
-var users = JSON.parse(localStorage.getItem('users') || '{}')
-var currentUser = localStorage.getItem('currentUser')
-
-var loginModal = document.getElementById('loginModal')
-var loginBtn = document.getElementById('loginBtn')
-var logoutBtn = document.getElementById('logoutBtn')
-var loginSubmit = document.getElementById('loginSubmit')
-var uploadBox = document.getElementById('uploadBox')
-
-loginBtn.onclick = function(){ loginModal.style.display = 'flex' }
-loginSubmit.onclick = login
-logoutBtn.onclick = logout
-
-function login(){
-  var u = usernameInput.value.trim()
-  var p = passwordInput.value
-  if(!u || !p) return
-
-  if(!users[u]) users[u] = { password:p, role:'viewer' }
-  if(users[u].password !== p){ alert('Wrong password'); return }
-  if(p === ADMIN_PASSWORD) users[u].role = 'admin'
-
-  localStorage.setItem('users', JSON.stringify(users))
-  localStorage.setItem('currentUser', u)
-  currentUser = u
-  applyRole()
-  loginModal.style.display = 'none'
-}
-
-function logout(){
-  localStorage.removeItem('currentUser')
-  currentUser = null
-  loginBtn.style.display = 'inline-block'
-  logoutBtn.style.display = 'none'
-  uploadBox.style.display = 'none'
-  loginBtn.textContent = 'Login'
-}
-
-function applyRole(){
-  if(!currentUser || !users[currentUser]) return
-  var r = users[currentUser].role
-  loginBtn.style.display = 'none'
-  logoutBtn.style.display = 'inline-block'
-  logoutBtn.textContent = 'Logout (' + currentUser + ')'
-  uploadBox.style.display = r === 'admin' ? 'block' : 'none'
-}
-
-// AUTO LOGIN ON REFRESH
-if(currentUser && users[currentUser]){
-  applyRole()
-}
-
-</script></body>
+var logoImg=document.getElementById('logoImg')
+logoImg.src='logo.png'
+logoImg.onerror=function(){this.src='https://via.placeholder.com/64'}
+var ADMIN_PASSWORD='AshDevYTERISANIMEFUN'
+var users=JSON.parse(localStorage.getItem('users')||'{}')
+var currentUser=localStorage.getItem('currentUser')
+var scripts=JSON.parse(localStorage.getItem('scripts')||'[]')
+var loginBtn=document.getElementById('loginBtn')
+var logoutBtn=document.getElementById('logoutBtn')
+var loginModal=document.getElementById('loginModal')
+var loginSubmit=document.getElementById('loginSubmit')
+var uploadBox=document.getElementById('uploadBox')
+var uploadBtn=document.getElementById('uploadBtn')
+var list=document.getElementById('list')
+var viewModal=document.getElementById('viewModal')
+var viewTitle=document.getElementById('viewTitle')
+var viewCode=document.getElementById('viewCode')
+var copyBtn=document.getElementById('copyBtn')
+var deleteBtn=document.getElementById('deleteBtn')
+var closeBtn=document.getElementById('closeBtn')
+var activeId=null
+loginBtn.onclick=function(){loginModal.style.display='flex'}
+logoutBtn.onclick=function(){localStorage.removeItem('currentUser');currentUser=null;loginBtn.style.display='inline-block';logoutBtn.style.display='none';uploadBox.style.display='none'}
+loginSubmit.onclick=function(){var u=usernameInput.value.trim();var p=passwordInput.value;if(!u||!p)return;if(!users[u])users[u]={password:p,role:'viewer'};if(users[u].password!==p)return;if(p===ADMIN_PASSWORD)users[u].role='admin';localStorage.setItem('users',JSON.stringify(users));localStorage.setItem('currentUser',u);currentUser=u;loginModal.style.display='none';applyRole()}
+function applyRole(){if(!currentUser)return;loginBtn.style.display='none';logoutBtn.style.display='inline-block';uploadBox.style.display=users[currentUser].role==='admin'?'block':'none'}
+if(currentUser&&users[currentUser])applyRole()
+uploadBtn.onclick=function(){if(!currentUser||users[currentUser].role!=='admin')return;var t=title.value.trim();var c=code.value;if(!t||!c)return;scripts.unshift({id:Date.now().toString(36),title:t,code:c,date:new Date().toLocaleDateString()});localStorage.setItem('scripts',JSON.stringify(scripts));title.value='';code.value='';render()}
+function render(){list.innerHTML='';scripts.forEach(function(s){var d=document.createElement('div');d.className='card';d.innerHTML='<h3>'+s.title+'</h3><span>'+s.date+'</span>';d.onclick=function(){open(s.id)};list.appendChild(d)})}
+function open(id){var s=scripts.find(x=>x.id===id);if(!s)return;activeId=id;viewTitle.textContent=s.title;viewCode.textContent=s.code;deleteBtn.style.display=currentUser&&users[currentUser].role==='admin'?'inline-block':'none';viewModal.style.display='flex'}
+copyBtn.onclick=function(){navigator.clipboard.writeText(viewCode.textContent)}
+deleteBtn.onclick=function(){if(!activeId)return;scripts=scripts.filter(x=>x.id!==activeId);localStorage.setItem('scripts',JSON.stringify(scripts));viewModal.style.display='none';render()}
+closeBtn.onclick=function(){viewModal.style.display='none'}
+search.oninput=function(){var v=search.value.toLowerCase();Array.from(list.children).forEach(function(c){c.style.display=c.innerText.toLowerCase().includes(v)?'block':'none'})}
+render()
+</script>
+</body>
 </html>
